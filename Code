@@ -1,0 +1,318 @@
+//Побудова трансформованого еліпсу передбачення для двомірних негаусівських даних
+f=figure();//Создание графического окна.
+//Устанавливаем размеры окна.
+set(f,'position',[0,0,700,300])
+//Устанавливаем заголовок окна.
+set(f,'figure_name','Побудова трансформованого еліпсу передбачення для двомірних негаусівських даних');
+
+//plot2d(x,y,-9);
+
+lab_text0=uicontrol(f,'style','text','string',...
+'Файл з даними','position',...
+[100,150,100,20]);
+edit_text=uicontrol(f,'style','edit','string',...
+'D:\Data_F\Effort133.txt','position',[50,120,200,20]);
+
+BtDatInp=uicontrol('style','pushbutton','string','Ввести',...
+'CallBack','[x,y,f1,n]=DataInput()','position',[300,120,100,20]);
+
+lab_text1=uicontrol(f,'style','text','string',...
+'Параметри нормалізуючого перетворення Джонсона','position',...
+[100,270,300,20]);
+lab_text2=uicontrol(f,'style','text','string',...
+'Вибір типу перетворення','position',...
+[500,270,200,20]);
+//Создание текстовых полей для подписей полей ввода коэффициентов.
+//Для X
+//Подпись Gamma_X=.
+lab_ax=uicontrol(f,'style','text','string','Gamma_X=','position',...
+[50,250,100,20]);
+//Подпись Nu_X=.
+lab_bx=uicontrol(f,'style','text','string','Nu_X=','position',...
+[150,250,100,20]);
+//Подпись Fi_X=.
+lab_cx=uicontrol(f,'style','text','string','Fi_X=','position',...
+[250,250,100,20]);
+//Подпись Lambda_X=.
+lab_dx=uicontrol(f,'style','text','string','Lambda_X=','position',...
+[350,250,100,20]);
+//Для Y
+//Подпись Gamma_Y=.
+lab_ay=uicontrol(f,'style','text','string','Gamma_Y=','position',...
+[50,200,100,20]);
+//Подпись Nu_Y=.
+lab_by=uicontrol(f,'style','text','string','Nu_Y=','position',...
+[150,200,100,20]);
+//Подпись Fi_Y=.
+lab_cy=uicontrol(f,'style','text','string','Fi_Y=','position',...
+[250,200,100,20]);
+//Подпись Lambda_Y=.
+lab_dy=uicontrol(f,'style','text','string','Lambda_Y=','position',...
+[350,200,100,20]);
+//Поле редактирования для ввода коэффициента a.
+edit_ax=uicontrol(f,'style','edit','string','1.895316845','position',...
+[50,230,100,20]);
+//Поле редактирования для ввода коэффициента b.
+edit_bx=uicontrol(f,'style','edit','string','0.79528285184','position',...
+[150,230,100,20]);
+//Поле редактирования для ввода коэффициента c.
+edit_cx=uicontrol(f,'style','edit','string','23.21750577','position',...
+[250,230,100,20]);
+//Поле редактирования для ввода коэффициента d.
+edit_dx=uicontrol(f,'style','edit','string','2799.03185','position',...
+[350,230,100,20]);
+//
+edit_ay=uicontrol(f,'style','edit','string','2.65439','position',...
+[50,180,100,20]);
+//Поле редактирования для ввода коэффициента b.
+edit_by=uicontrol(f,'style','edit','string','0.94859248','position',...
+[150,180,100,20]);
+//Поле редактирования для ввода коэффициента c.
+edit_cy=uicontrol(f,'style','edit','string','96.3673326','position',...
+[250,180,100,20]);
+//Поле редактирования для ввода коэффициента d.
+edit_dy=uicontrol(f,'style','edit','string','26668.57295','position',...
+[350,180,100,20]);
+//
+//Текстовое поле, определяющее вывод результатов.
+textresult=uicontrol(f,'style','text','string','','position',...
+[5,80,650,20]);
+//Флажок, отвечающий за выбор типа преобразования.
+radio_bikv_x=uicontrol('style','radiobutton','string',...
+'SU (включити), SB (виключити)','value',1,'position',...
+[500,230,300,20]);
+//
+radio_bikv_y=uicontrol('style','radiobutton','string',...
+'SU (включити), SB (виключити)','value',1,'position',...
+[500,180,300,20]);
+//
+
+Btnr_pred_int=uicontrol('style','pushbutton','string','Знайти','CallBack',...
+'[y_pezy_min,y_pezy_max,xi_z,pezy_min,pezy_max,zxi,zx,zy]=pred_el(x,y,n)',...
+'position',[50,50,100,20]);
+
+BtOutput=uicontrol('style','pushbutton','string','Побудувати','CallBack',...
+'[f2,f3]=Output_yr(y_pezy_min,y_pezy_max,xi_z,x,y,pezy_min,pezy_max,zxi,zx,zy)',...
+'position',[175,50,100,20]);
+
+BtClose=uicontrol('style','pushbutton','string','Закрити',...
+'CallBack','_Close()','position',[300,50,100,20]);
+
+function [x, y, f1, n]=DataInput()
+dir_name=get(edit_text,'string');
+
+file_PC=mopen(dir_name,'r');
+file_PC2=mopen('D:\Data_F\Effort133_out.txt','w+');
+i=1;
+//n=52;
+while (meof(file_PC))<1
+//for i=1:n
+    x(i)=mfscanf(file_PC,'%f'); y(i)=mfscanf(file_PC,'%f');
+    i=i+1;
+end;
+n=i-1;
+for i=1:n
+    mfprintf(file_PC2,'%f\t%f\n',x,y);
+  // mfprintf(file_PC2,'%d\n',x);
+end;    
+mclose(file_PC);
+mclose(file_PC2);
+f1=figure();//Создание графического окна.
+//Устанавливаем размеры окна.
+set(f1,'position',[50,50,700,300]);
+//Устанавливаем заголовок окна.
+set(f1,'figure_name','Емпіричні дані');
+//plot(x,y,"*r");
+plot2d(x,y,-9);
+endfunction
+
+//Функція побудови трансформованого еліпсу передбачення  
+//для двомірних негаусівських даних.
+function [y_pezy_min, y_pezy_max, xi_z, pezy_min, pezy_max, zxi, zx, zy]=pred_el(x, y, n)
+
+//Считываем значение переменных из текстовых полей и
+//преобразовываем их к числовому типу.
+ax=eval(get(edit_ax,'string'));
+bx=eval(get(edit_bx,'string'));
+cx=eval(get(edit_cx,'string'));
+dx=eval(get(edit_dx,'string'));
+ay=eval(get(edit_ay,'string'));
+by=eval(get(edit_by,'string'));
+cy=eval(get(edit_cy,'string'));
+dy=eval(get(edit_dy,'string'));
+//Проверяем значение флажка, если флажок выключен,
+if (get(radio_bikv_x,'value')==0)&(get(radio_bikv_y,'value')==0)
+
+    xA=0;
+    yA=0;
+    for i=1:n
+        xA=xA+x(i);
+        yA=yA+y(i);
+    end;
+    xA=xA/n;
+    yA=yA/n;
+    S2x=0;
+    S2y=0;
+    sxy=0;
+    for i=1:n
+        S2x=S2x+(x(i)-xA)^2;
+        S2y=S2y+(y(i)-yA)^2;
+        sxy=sxy+(x(i)-xA)*(y(i)-yA);
+    end;
+    S2x=S2x/n;
+    S2y=S2y/n;
+    sxy=sxy/n;
+    
+    Dfn=2;
+    Dfd=n-2;
+    Q=0.05;
+    P=1-Q;
+    [F]=cdff("F",Dfn,Dfd,P,Q);
+    test_st=2*(n*n-1)*F/n/(n-2);
+    
+    xmin=xA-(S2x*test_st)^0.5;
+    xmax=xA+(S2x*test_st)^0.5;
+    step=(xmax-xmin)/(n-1);
+//    step=(zxmax-zxmin)/n;
+    cS=(S2x*S2y-sxy^2)/S2x/S2y;
+    a=1/S2y;
+    for i=1:n
+       xi(i)=xmin+step*(i-1);
+//        zxi(i)=zxmin+step*i;
+        c=cS*test_st-(xi(i)-xA)^2/S2x;
+        b=2*sxy*(xi(i)-xA)/S2x/S2y;
+        dis=b*b+4*a*c;
+        sqdis=dis^0.5;
+        pey_min(i)=yA+(b-sqdis)/2/a;
+        pey_max(i)=yA+(b+sqdis)/2/a;
+               
+    end;
+
+    zxA=0;
+    zyA=0;
+    for i=1:n
+        zx(i)=ax+bx*log((x(i)-cx)/(dx-x(i)+cx));
+        zy(i)=ay+by*log((y(i)-cy)/(dy-y(i)+cy));
+        zxA=zxA+zx(i);
+        zyA=zyA+zy(i);
+    end;
+    zxA=zxA/n;
+    zyA=zyA/n;
+    S2zx=0;
+    S2zy=0;
+    szxzy=0;
+    for i=1:n
+        S2zx=S2zx+(zx(i)-zxA)^2;
+        S2zy=S2zy+(zy(i)-zyA)^2;
+        szxzy=szxzy+(zx(i)-zxA)*(zy(i)-zyA);
+    end;
+    S2zx=S2zx/n;
+    S2zy=S2zy/n;
+    szxzy=szxzy/n;
+    
+    Dfn=2;
+    Dfd=n-2;
+    Q=0.005;
+    P=1-Q;
+    [F]=cdff("F",Dfn,Dfd,P,Q);
+    test_st=2*(n*n-1)*F/n/(n-2);
+    
+    zxmin=zxA-(S2zx*test_st)^0.5;
+    zxmax=zxA+(S2zx*test_st)^0.5;
+    step=(zxmax-zxmin)/(n-1);
+//    step=(zxmax-zxmin)/n;
+    cS=(S2zx*S2zy-szxzy^2)/S2zx/S2zy;
+    a=1/S2zy;
+    for i=1:n
+       zxi(i)=zxmin+step*(i-1);
+//        zxi(i)=zxmin+step*i;
+        c=cS*test_st-(zxi(i)-zxA)^2/S2zx;
+        b=2*szxzy*(zxi(i)-zxA)/S2zx/S2zy;
+        dis=b*b+4*a*c;
+        sqdis=dis^0.5;
+        pezy_min(i)=zyA+(b-sqdis)/2/a;
+        pezy_max(i)=zyA+(b+sqdis)/2/a;
+        end;
+    
+    for i=1:n
+        xi_z(i)=cx+dx/(1+exp(-(zxi(i)-ax)/bx));
+        y_pezy_min(i)=cy+dy/(1+exp(-(pezy_min(i)-ay)/by));
+        y_pezy_max(i)=cy+dy/(1+exp(-(pezy_max(i)-ay)/by));
+               
+    end;
+
+//    
+//f_2=figure();//Создание графического окна.
+//Устанавливаем размеры окна.
+//set(f_2,'position',[100,100,700,300]);
+//Устанавливаем заголовок окна.
+//set(f_2,'figure_name',...
+//'Eліпс передбачення і трансформований еліпс передбачення для негаусівських даних');
+
+//plot2d(xi,pey_max,1);
+//plot2d(x,y,-9);
+
+//plot2d(xi,pey_min,1);
+
+//plot2d(xi_z,y_pezy_max,5);
+
+//plot2d(xi_z,y_pezy_min,5);
+//    
+    
+    if  dis>0   
+     set(textresult,'string',...
+     sprintf("Eліпс передбачення знайдено\Det=%1.4f",dis));     
+    else
+    set(textresult,'string',...
+     sprintf("Eліпс передбачення не знайдено\Det=%1.4f",dis)); 
+    
+    end;
+
+else
+   
+   set(textresult,'string','Eліпс передбачення не знайдено'); 
+    
+end;     
+    
+endfunction
+
+function Outputy(x, y)
+f1=figure();//Создание графического окна.
+//Устанавливаем размеры окна.
+set(f1,'position',[50,50,700,300]);
+//Устанавливаем заголовок окна.
+set(f1,'figure_name','Емпіричні дані');
+plot2d(x,y,-9);
+endfunction
+//function [f2]=Output_yr(x,y,yr,piyr_min,piyr_max)
+function [f2, f3]=Output_yr(y_pezy_min, y_pezy_max, xi_z, x, y, pezy_min, pezy_max, zxi, zx, zy)
+f2=figure();//Создание графического окна.
+//Устанавливаем размеры окна.
+set(f2,'position',[100,100,700,300]);
+//Устанавливаем заголовок окна.
+set(f2,'figure_name','Eліпс передбачення');
+
+plot2d(zxi,pezy_max,5);
+plot2d(zx,zy,-9);
+//plot2d(xi,yr,1);
+plot2d(zxi,pezy_min,5);
+
+f3=figure();//Создание графического окна.
+//Устанавливаем размеры окна.
+set(f3,'position',[150,150,700,300]);
+//Устанавливаем заголовок окна.
+set(f3,'figure_name','Трансформований еліпс передбачення');
+
+plot2d(xi_z,y_pezy_max,5);
+plot2d(x,y,-9);
+//plot2d(xi,yr,1);
+plot2d(xi_z,y_pezy_min,5);
+endfunction
+
+//Функция закрытия окна.
+function _Close()
+close(f);
+close(f1);
+close(f2);
+close(f3);
+endfunction
